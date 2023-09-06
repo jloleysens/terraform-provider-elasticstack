@@ -260,7 +260,7 @@ func (a *ApiClient) GetFleetClient() (*fleet.Client, error) {
 
 func (a *ApiClient) SetSloAuthContext(ctx context.Context) context.Context {
 	if a.kibanaConfig.ApiKey != "" {
-		return context.WithValue(context.Background(), slo.ContextAPIKeys, map[string]slo.APIKey{
+		return context.WithValue(ctx, slo.ContextAPIKeys, map[string]slo.APIKey{
 			"ApiKey": {
 				Key: a.kibanaConfig.ApiKey,
 			},
@@ -274,7 +274,7 @@ func (a *ApiClient) SetSloAuthContext(ctx context.Context) context.Context {
 
 func (a *ApiClient) SetAlertingAuthContext(ctx context.Context) context.Context {
 	if a.kibanaConfig.ApiKey != "" {
-		return context.WithValue(context.Background(), alerting.ContextAPIKeys, map[string]alerting.APIKey{
+		return context.WithValue(ctx, alerting.ContextAPIKeys, map[string]alerting.APIKey{
 			"ApiKey": {
 				Key: a.kibanaConfig.ApiKey,
 			},
