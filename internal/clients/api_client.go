@@ -262,7 +262,8 @@ func (a *ApiClient) SetSloAuthContext(ctx context.Context) context.Context {
 	if a.kibanaConfig.ApiKey != "" {
 		auth := map[string]slo.APIKey{
 			"apiKeyAuth": {
-				Key: a.kibanaConfig.ApiKey,
+				Prefix: "ApiKey",
+				Key:    a.kibanaConfig.ApiKey,
 			},
 		}
 		return context.WithValue(ctx, slo.ContextAPIKeys, auth)
@@ -277,7 +278,8 @@ func (a *ApiClient) SetAlertingAuthContext(ctx context.Context) context.Context 
 	if a.kibanaConfig.ApiKey != "" {
 		auth := map[string]alerting.APIKey{
 			"apiKeyAuth": {
-				Key: a.kibanaConfig.ApiKey,
+				Prefix: "ApiKey",
+				Key:    a.kibanaConfig.ApiKey,
 			},
 		}
 		return context.WithValue(ctx, slo.ContextAPIKeys, auth)
