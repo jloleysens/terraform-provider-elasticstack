@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -560,6 +561,15 @@ func buildKibanaConfig(d *schema.ResourceData, baseConfig BaseConfig) (kibana.Co
 }
 
 func buildKibanaClient(config kibana.Config) (*kibana.Client, diag.Diagnostics) {
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
+	log.Printf("Kibana config: %s", config.ApiKey)
 	kib, err := kibana.NewClient(config)
 	if err != nil {
 		return nil, diag.FromErr(err)
