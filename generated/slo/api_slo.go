@@ -1158,7 +1158,7 @@ func (a *SloAPIService) GetSloOpExecute(r ApiGetSloOpRequest) (*SloResponse, *ht
 				} else {
 					key = apiKey.Key
 				}
-				localVarHeaderParams["ApiKey"] = key
+				localVarHeaderParams["Authorization"] = key
 			}
 		}
 	}

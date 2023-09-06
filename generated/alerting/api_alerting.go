@@ -583,7 +583,7 @@ func (a *AlertingApiService) CreateRuleExecute(r ApiCreateRuleRequest) (*RuleRes
 				} else {
 					key = apiKey.Key
 				}
-				localVarHeaderParams["ApiKey"] = key
+				localVarHeaderParams["Authorization"] = key
 			}
 		}
 	}
