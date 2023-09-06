@@ -514,7 +514,6 @@ func buildKibanaConfig(d *schema.ResourceData, baseConfig BaseConfig) (kibana.Co
 	config := kibana.Config{
 		Username: baseConfig.Username,
 		Password: baseConfig.Password,
-		ApiKey:   kibConn.(map[string]interface{})["api_key"].(string),
 	}
 
 	// if defined, then we only have a single entry
