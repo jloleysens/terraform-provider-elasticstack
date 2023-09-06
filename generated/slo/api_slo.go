@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -1146,8 +1147,11 @@ func (a *SloAPIService) GetSloOpExecute(r ApiGetSloOpRequest) (*SloResponse, *ht
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "kbn-xsrf", r.kbnXsrf, "")
 	if r.ctx != nil {
 		// API Key Authentication
+		log.Printf("here!!!")
 		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			log.Printf("here!!! %s", auth)
 			if apiKey, ok := auth["apiKeyAuth"]; ok {
+				log.Printf("here!!! %s", apiKey)
 				var key string
 				if apiKey.Prefix != "" {
 					key = apiKey.Prefix + " " + apiKey.Key
