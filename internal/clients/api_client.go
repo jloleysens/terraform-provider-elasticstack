@@ -544,11 +544,6 @@ func buildKibanaConfig(d *schema.ResourceData, baseConfig BaseConfig) (kibana.Co
 		if apiKey, ok := kibConfig["api_key"]; ok && apiKey != "" {
 			config.ApiKey = apiKey.(string)
 		}
-
-		fmt.Printf("config: %+v\n", config.ApiKey)
-		fmt.Printf("config: %+v\n", config.Username)
-		fmt.Printf("config: %+v\n", config.Password)
-
 		if endpoints, ok := kibConfig["endpoints"]; ok && len(endpoints.([]interface{})) > 0 {
 			// We're curently limited by the API to a single endpoint
 			if endpoint := endpoints.([]interface{})[0]; endpoint != nil {
