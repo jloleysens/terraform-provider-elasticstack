@@ -144,6 +144,12 @@ func GetKibanaConnectionSchema() *schema.Schema {
 					Sensitive:    true,
 					RequiredWith: []string{"kibana.0.username"},
 				},
+				"api_key": {
+					Description: "API key for API authentication to Kibana.",
+					Type:        schema.TypeString,
+					Optional:    true,
+					Sensitive:   true,
+				},
 				"endpoints": {
 					Description: "A list of endpoints where the terraform provider will point to, this must include the http(s) schema and port number.",
 					Type:        schema.TypeList,

@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
-	"github.com/disaster37/go-kibana-rest/v8"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/terraform-provider-elasticstack/generated/alerting"
 	"github.com/elastic/terraform-provider-elasticstack/generated/connectors"
@@ -25,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/jloleysens/go-kibana-rest/v8"
 )
 
 type CompositeId struct {
@@ -514,6 +514,7 @@ func buildKibanaConfig(d *schema.ResourceData, baseConfig BaseConfig) (kibana.Co
 	config := kibana.Config{
 		Username: baseConfig.Username,
 		Password: baseConfig.Password,
+		ApiKey:   kibConn.(map[string]interface{})["api_key"].(string),
 	}
 
 	// if defined, then we only have a single entry
@@ -540,6 +541,9 @@ func buildKibanaConfig(d *schema.ResourceData, baseConfig BaseConfig) (kibana.Co
 		}
 		if password, ok := kibConfig["password"]; ok && password != "" {
 			config.Password = password.(string)
+		}
+		if apiKey, ok := kibConfig["api_key"]; ok && apiKey != "" {
+			config.ApiKey = apiKey.(string)
 		}
 
 		if endpoints, ok := kibConfig["endpoints"]; ok && len(endpoints.([]interface{})) > 0 {

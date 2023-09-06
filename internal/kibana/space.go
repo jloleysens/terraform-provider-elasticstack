@@ -3,11 +3,11 @@ package kibana
 import (
 	"context"
 
-	"github.com/disaster37/go-kibana-rest/v8/kbapi"
 	"github.com/elastic/terraform-provider-elasticstack/internal/clients"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/jloleysens/go-kibana-rest/v8/kbapi"
 )
 
 func ResourceSpace() *schema.Resource {
