@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-mux v0.11.1
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
-	github.com/jloleysens/go-kibana-rest/v8 v8.5.4
+	github.com/jloleysens/go-kibana-rest/v8 v8.5.6
 	github.com/stretchr/testify v1.8.4
 )
 
