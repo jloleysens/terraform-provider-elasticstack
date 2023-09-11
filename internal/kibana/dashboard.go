@@ -18,6 +18,8 @@ func ResourceDashboard() *schema.Resource {
 	return &schema.Resource{
 		Description:   "Creates a Kibana dashboard.",
 		CreateContext: resourceDashboardCreate,
+		UpdateContext: resourceDashboardCreate,
+		ReadContext:   resourceDashboardRead,
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Description: "A custom ID to use or a random UUID v1 or v4 will be generated and used.",
