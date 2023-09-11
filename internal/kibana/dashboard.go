@@ -20,7 +20,7 @@ func ResourceDashboard() *schema.Resource {
 		CreateContext: resourceDashboardCreate,
 		UpdateContext: resourceDashboardCreate,
 		ReadContext:   resourceDashboardRead,
-		DeleteContext: ,
+		DeleteContext: resourceDashboardDelete,
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Description: "A custom ID to use or a random UUID v1 or v4 will be generated and used.",
