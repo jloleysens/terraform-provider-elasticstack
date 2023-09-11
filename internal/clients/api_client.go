@@ -277,6 +277,37 @@ func (a *ApiClient) SetAlertingAuthContext(ctx context.Context) context.Context 
 	}
 }
 
+type BasicAuth struct {
+	UserName string `json:"userName,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
+func (a *ApiClient) GetBasicAuth() (BasicAuth, bool) {
+	if a.kibanaConfig.Username != "" && a.kibanaConfig.Password != "" {
+		return BasicAuth{UserName: a.kibanaConfig.Username, Password: a.kibanaConfig.Password}, true
+	}
+	return BasicAuth{}, false
+}
+
+type APIKey struct {
+	Key    string
+	Prefix string
+}
+
+func (a *ApiClient) GetAPIKeyAuth() (APIKey, bool) {
+	if a.kibanaConfig.ApiKey != "" {
+		return APIKey{
+			Key:    a.kibanaConfig.ApiKey,
+			Prefix: "ApiKey",
+		}, true
+	}
+	return APIKey{}, false
+}
+
+func (a *ApiClient) ReadBasePath() string {
+	return a.kibanaConfig.Address
+}
+
 func (a *ApiClient) ID(ctx context.Context, resourceId string) (*CompositeId, diag.Diagnostics) {
 	var diags diag.Diagnostics
 	clusterId, diags := a.ClusterID(ctx)

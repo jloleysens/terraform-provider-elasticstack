@@ -12,3 +12,7 @@ func unwrapOptionalField[T any](field *T) T {
 func makePtr[T any](v T) *T {
 	return &v
 }
+
+var (
+	apiAuthScheme = "ApiKey"
+)
