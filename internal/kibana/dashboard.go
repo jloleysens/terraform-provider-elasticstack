@@ -107,7 +107,7 @@ func resourceDashboardRead(ctx context.Context, d *schema.ResourceData, meta int
 }
 
 func resourceDashboardDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	return diag.Error("Deleting dashboards is not supported")
+	return diag.Errorf("Deleting dashboards is not supported")
 }
 
 func getDashboardFromResourceData(d *schema.ResourceData) (models.SavedObject, diag.Diagnostics) {
