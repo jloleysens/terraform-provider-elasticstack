@@ -2,8 +2,6 @@ package kibana
 
 import (
 	"context"
-	"encoding/json"
-	"strings"
 
 	"github.com/elastic/terraform-provider-elasticstack/internal/clients"
 	"github.com/elastic/terraform-provider-elasticstack/internal/clients/kibana"
@@ -40,8 +38,9 @@ func ResourceDashboard() *schema.Resource {
 				Description:      "The dashboard definition, this is the value that we get by exporting the dashboard from Kibana",
 				Type:             schema.TypeString,
 				Required:         true,
-				DiffSuppressFunc: utils.DiffJsonSuppress,
 				ValidateFunc:     validation.StringIsJSON,
+				DiffSuppressFunc: utils.DiffJsonSuppress,
+				// DiffSuppressOnRefresh: true,
 			},
 		},
 	}
@@ -62,8 +61,7 @@ func resourceDashboardCreate(ctx context.Context, d *schema.ResourceData, meta i
 		return diags
 	}
 
-	id := &clients.CompositeId{ClusterId: dashboard.SpaceID, ResourceId: result.ID}
-	d.SetId(id.String())
+	d.SetId(result.ID)
 	return resourceDashboardRead(ctx, d, meta)
 }
 
@@ -72,12 +70,8 @@ func resourceDashboardRead(ctx context.Context, d *schema.ResourceData, meta int
 	if diags.HasError() {
 		return diags
 	}
-	compId, diags := clients.CompositeIdFromStr(d.Id())
-	if diags.HasError() {
-		return diags
-	}
-	id := compId.ResourceId
-	spaceId := compId.ClusterId
+	id := d.Id()
+	spaceId := d.Get("space_id").(string)
 
 	dashboard, diags := kibana.GetSavedObject(client, id, spaceId, "dashboard")
 	if dashboard == nil && diags == nil {
@@ -95,11 +89,7 @@ func resourceDashboardRead(ctx context.Context, d *schema.ResourceData, meta int
 	if err := d.Set("space_id", dashboard.SpaceID); err != nil {
 		return diag.FromErr(err)
 	}
-	attributes, err := json.Marshal(dashboard.Attributes)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	if err := d.Set("attributes", string(attributes)); err != nil {
+	if err := d.Set("attributes", dashboard.Attributes); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -107,18 +97,13 @@ func resourceDashboardRead(ctx context.Context, d *schema.ResourceData, meta int
 }
 
 func resourceDashboardDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	return diag.Errorf("Deleting dashboards is not supported")
+	return diag.Errorf("Deleting dashboards is not supported, you will have to remove them manually")
 }
 
 func getDashboardFromResourceData(d *schema.ResourceData) (models.SavedObject, diag.Diagnostics) {
 	var diags diag.Diagnostics
 	dashboard := models.SavedObject{}
-	attributesStr := d.Get("attributes")
-	attributes := map[string]interface{}{}
-	if err := json.NewDecoder(strings.NewReader(attributesStr.(string))).Decode(&attributes); err != nil {
-		return models.SavedObject{}, diag.FromErr(err)
-	}
-	dashboard.Attributes = attributes
+	dashboard.Attributes = d.Get("attributes").(string)
 	dashboard.SpaceID = d.Get("space_id").(string)
 	dashboard.ID = d.Get("id").(string)
 	return dashboard, diags

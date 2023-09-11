@@ -2,7 +2,6 @@ package kibana
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
 
 	"github.com/elastic/terraform-provider-elasticstack/internal/clients"
@@ -19,13 +18,6 @@ var (
 type SavedObjectImportSuccessResponse struct {
 	ID string `json:"id"`
 }
-
-// type SavedObjectImportRequest struct {
-// 	Type       string                 `json:"type"`
-// 	ID         string                 `json:"id"`
-// 	Attributes map[string]interface{} `json:"attributes"`
-// 	Overwrite  bool                   `json:"overwrite"`
-// }
 
 type SavedObjectImportRequestQueryParams struct {
 	Overwrite bool `json:"overwrite"`
@@ -48,7 +40,9 @@ type SavedObjectGetRequest struct {
 }
 
 type SavedObjectGetResult struct {
-	Objects []interface{} `json:"objects"`
+	ID         string                 `json:"id"`
+	Type       string                 `json:"type"`
+	Attributes map[string]interface{} `json:"attributes"`
 }
 
 type SavedObjectGetResultEntry struct {
@@ -89,34 +83,43 @@ func CreateSavedObject(apiClient *clients.ApiClient, savedObject models.SavedObj
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
-	entry := savedObject.Attributes
-	if savedObject.ID != "" {
-		entry["id"] = savedObject.ID
+	attributesString := savedObject.Attributes
+	// ==> Decode to go object
+	attributes := map[string]interface{}{}
+	if err := json.NewDecoder(strings.NewReader(attributesString)).Decode(&attributes); err != nil {
+		return nil, diag.FromErr(err)
 	}
-	jsonString, err := json.Marshal(entry)
+	if savedObject.ID != "" {
+		attributes["id"] = savedObject.ID
+	}
+	// <== Marshall to JSON bytes
+	jsonBytes, err := json.Marshal(attributes)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
-	req.
+	jsonString := strings.Replace(string(jsonBytes), "\n", "", -1)
+	path := getFullPath(apiClient.ReadBasePath(), importPath, savedObject.SpaceID)
+	resp, err := req.
 		SetHeader("Content-Type", "multipart/form-data").
 		SetQueryParam("overwrite", "true").
-		SetBody([]byte(jsonString)).
-		SetResult(&SavedObjectSuccessImportResult{})
-	path := getFullPath(apiClient.ReadBasePath(), importPath, savedObject.SpaceID)
-	resp, err := req.Post(path)
+		SetFileReader("file", "import.ndjson", strings.NewReader(jsonString)).
+		SetResult(&SavedObjectSuccessImportResult{}).
+		Post(path)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
 	result := resp.Result().(*SavedObjectSuccessImportResult)
 
 	if result.SuccessCount == 0 {
-		return nil, diag.FromErr(errors.New("Failed to create saved object"))
+		return nil, diag.Errorf("Failed to create saved object")
 	}
 
 	savedObject.ID = result.SuccessResults[0].ID
 
 	return &savedObject, nil
 }
+
+type GetResult string
 
 func GetSavedObject(apiClient *clients.ApiClient, id string, spaceID string, objectType string) (*models.SavedObject, diag.Diagnostics) {
 	req, err := buildRequest(apiClient)
@@ -128,23 +131,29 @@ func GetSavedObject(apiClient *clients.ApiClient, id string, spaceID string, obj
 		IncludeReferencesDeep: false,
 		ExcludeExportDetails:  true,
 	}
-	req.SetBody(body).SetResult(&SavedObjectGetResult{})
+
 	path := getFullPath(apiClient.ReadBasePath(), exportPath, spaceID)
-	resp, err := req.Post(path)
+	resp, err := req.
+		SetBody(body).
+		Post(path)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
-	result := resp.Result().(*SavedObjectGetResult)
-
-	if len(result.Objects) == 0 {
-		return nil, diag.FromErr(errors.New("Failed to create saved object"))
+	result := SavedObjectGetResult{}
+	if err := json.Unmarshal(resp.Body(), &result); err != nil {
+		return nil, diag.FromErr(err)
+	}
+	if result.ID == "" {
+		return nil, diag.Errorf(`Could not find dashboard with ID "%s", result: %s`, id, result)
 	}
 
-	res := result.Objects[0].(map[string]interface{})
-
+	b, err := json.Marshal(result.Attributes)
+	if err != nil {
+		return nil, diag.FromErr(err)
+	}
 	return &models.SavedObject{
-		ID:         res["id"].(string),
+		ID:         result.ID,
 		SpaceID:    spaceID,
-		Attributes: res,
+		Attributes: string(b),
 	}, nil
 }
