@@ -20,6 +20,7 @@ func ResourceDashboard() *schema.Resource {
 		CreateContext: resourceDashboardCreate,
 		UpdateContext: resourceDashboardCreate,
 		ReadContext:   resourceDashboardRead,
+		DeleteContext: ,
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Description: "A custom ID to use or a random UUID v1 or v4 will be generated and used.",
@@ -103,6 +104,10 @@ func resourceDashboardRead(ctx context.Context, d *schema.ResourceData, meta int
 	}
 
 	return diags
+}
+
+func resourceDashboardDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	return diag.Error("Deleting dashboards is not supported")
 }
 
 func getDashboardFromResourceData(d *schema.ResourceData) (models.SavedObject, diag.Diagnostics) {
