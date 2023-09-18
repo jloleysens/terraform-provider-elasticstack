@@ -144,7 +144,7 @@ func GetSavedObject(apiClient *clients.ApiClient, id string, spaceID string, obj
 		return nil, diag.FromErr(err)
 	}
 	if result.ID == "" {
-		return nil, diag.Errorf(`Could not find dashboard with ID "%s", result: %s`, id, result)
+		return nil, nil
 	}
 
 	b, err := json.Marshal(result.Attributes)
